@@ -229,28 +229,28 @@
 
         // ─── อัปเดต Stat Cards ───────────────────────────────
         function updateStats(salesData) {
-            const totals   = salesData.map(item => item.total);
-            const sum      = totals.reduce((a, b) => a + b, 0);
+            const totals = salesData.map(item => item.total);
+            const sum = totals.reduce((a, b) => a + b, 0);
             const maxTotal = Math.max(...totals);
-            const bestDay  = salesData.find(item => item.total === maxTotal);
+            const bestDay = salesData.find(item => item.total === maxTotal);
 
-            document.getElementById('statTotal').textContent   = `฿${sum.toLocaleString('th-TH')}`;
-            document.getElementById('statDays').textContent    = `${salesData.length} วัน`;
+            document.getElementById('statTotal').textContent = `฿${sum.toLocaleString('th-TH')}`;
+            document.getElementById('statDays').textContent = `${salesData.length} วัน`;
             document.getElementById('statBestDay').textContent = bestDay ? bestDay.date : '—';
         }
 
         function resetStats() {
-            document.getElementById('statTotal').textContent   = '—';
-            document.getElementById('statDays').textContent    = '—';
+            document.getElementById('statTotal').textContent = '—';
+            document.getElementById('statDays').textContent = '—';
             document.getElementById('statBestDay').textContent = '—';
         }
 
         // ─── Export CSV ───────────────────────────────────────
-        function exportCSV() {
+        async function exportCSV() {
             if (!currentData.length) return;
 
             const startDate = document.getElementById('startDate').value;
-            const endDate   = document.getElementById('endDate').value;
+            const endDate = document.getElementById('endDate').value;
 
             const rows = [
                 ['\uFEFFวันที่', 'ยอดขาย (บาท)'],
@@ -259,13 +259,32 @@
 
             const csvContent = rows.map(r => r.join(',')).join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url  = URL.createObjectURL(blob);
 
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sales_${startDate}_${endDate}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
+            // ใช้ File System Access API → เปิด Save As dialog
+            if (window.showSaveFilePicker) {
+                try {
+                    const fileHandle = await window.showSaveFilePicker({
+                        suggestedName: `sales_${startDate}_${endDate}.csv`,
+                        types: [{
+                            description: 'CSV File',
+                            accept: { 'text/csv': ['.csv'] }
+                        }]
+                    });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.error(err); // กด Cancel ไม่ต้อง error
+                }
+            } else {
+                // Fallback สำหรับ browser ที่ไม่รองรับ (Firefox, Safari)
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sales_${startDate}_${endDate}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
         }
 
         // ─── Helpers ─────────────────────────────────────────

@@ -45,10 +45,17 @@
                     <label>Job Position:</label>
                     <select name="position" required>
                         <option value=""></option>
-                        <% if (user && user.position === "Admin") { %>
-                            <option value="Admin" <%= old && old.position === 'Admin' ? 'selected' : '' %>>Admin</option>
+
+                        <% if (isFirstUser) { %>
+                            <%/* First user ต้องเป็น Admin เท่านั้น */%>
+                            <option value="Admin" selected>Admin</option>
+                        <% } else { %>
+                            <% if (user && user.position === "Admin") { %>
+                                <option value="Admin" <%= old && old.position === 'Admin' ? 'selected' : '' %>>Admin</option>
+                            <% } %>
+                            <option value="Cashier" <%= old && old.position === 'Cashier' ? 'selected' : '' %>>Cashier</option>
                         <% } %>
-                        <option value="Cashier" <%= old && old.position === 'Cashier' ? 'selected' : '' %>>Cashier</option>
+                        
                     </select>
 
                     <label>Password:</label>

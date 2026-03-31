@@ -1,39 +1,23 @@
-# Bread Shop - Installation Guide
+# 🍞 Bread-Shop Management System
+ระบบจัดการร้านขนมปังและการขาย (Web Application)
 
-## Requirements
-- Node.js v18+
-- MongoDB (local or Atlas)
+## 🛠️ Stack ที่ใช้ในโปรเจค
+- **Backend:** Node.js / Express
+- **Database:** MongoDB (Mongoose)
+- **Frontend Template:** EJS
+- **Styling:** CSS / Bootstrap
 
-## Installation
+---
 
-### 1. Clone the repository
+## 📌 วิธีการติดตั้ง (Installation)
+
+### 1. เตรียมความพร้อมในเครื่อง
+ตรวจสอบว่าเครื่องของคุณติดตั้ง **Node.js** และ **MongoDB** เรียบร้อยแล้ว:
+- ตรวจสอบ Node: `node -v`
+- ตรวจสอบ npm: `npm -v`
+
+### 2. Clone โปรเจค
+เปิด Terminal และรันคำสั่ง:
 ```bash
-git clone https://github.com/username/repo-name.git
-cd repo-name
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Create `.env` file
-```
-MONGODB_URI=mongodb://localhost:27017/pshop
-SESSION_SECRET=your_secret_key_here
-PORT=3000
-```
-
-### 4. Run the project
-```bash
-node app.js
-```
-หรือถ้าใช้ nodemon
-```bash
-npx nodemon app.js
-```
-
-### 5. Open browser
-```
-http://localhost:3000
-```
+git clone [https://github.com/Newbie382/Bread-Shop.git](https://github.com/Newbie382/Bread-Shop.git)
+cd Bread-Shop

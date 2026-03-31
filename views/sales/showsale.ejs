@@ -35,24 +35,25 @@
                 <th>Total Price</th>
                 <th>Date</th>
             </tr>
-            <% sales.forEach(sale=> { %>
+            <% sales.forEach(sale => { %>
                 <tr>
                     <td>
-                        <%= sale.product.name %>
+                        <%= sale.product?.name || 'ไม่พบสินค้า' %>
                     </td>
                     <td>
-                        <%= sale.member.name %>
+                        <%= sale.member?.name || 'ไม่ระบุสมาชิก' %>
                     </td>
                     <td>
                         <%= sale.quantity %>
                     </td>
-                    <td>$<%= sale.totalPrice.toFixed(2) %>
+                    <td>
+                        <%= sale.totalPrice ? '$' + sale.totalPrice.toFixed(2) : '-' %>
                     </td>
                     <td>
-                        <%= sale.date.toDateString() %>
+                        <%= sale.date ? sale.date.toDateString() : '-' %>
                     </td>
                 </tr>
-                <% }) %>
+            <% }) %>
         </table>
     </div>
 </body>

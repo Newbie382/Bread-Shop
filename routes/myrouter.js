@@ -67,23 +67,40 @@ router.get("/logout", (req, res) => {
     })
 })
 
-router.get("/register", (req, res) => {
-    res.render("register/regisindex")
+router.get("/register", async (req, res) => {
+    const userCount = await Member.countDocuments()
+    res.render("register/regisindex", {
+        isFirstUser: userCount === 0,
+        user: req.session.user || null,
+        old: req.session.old || null,
+        error: undefined
+    })
 })
 
 router.post("/register", async (req, res) => {
     const { name, email, phone, password, confirmPassword, position } = req.body
     const oldData = { name, email, phone, position }
+    const userCount = await Member.countDocuments()  // เพิ่มบรรทัดนี้
+    const isFirstUser = userCount === 0              // เพิ่มบรรทัดนี้
 
     if (password !== confirmPassword) {
-        req.session.old = oldData
-        return res.render("register/regisindex", { error: "Passwords do not match" })
+        return res.render("register/regisindex", {
+            error: "Passwords do not match",
+            old: oldData,
+            isFirstUser,             // ส่งไปด้วย
+            user: req.session.user || null
+        })
     }
 
     try {
         const existingUser = await Member.findOne({ email })
         if (existingUser) {
-            return res.render("register/regisindex", { error: "Email already registered" })
+            return res.render("register/regisindex", {
+                error: "Email already registered",
+                old: oldData,
+                isFirstUser,         // ส่งไปด้วย
+                user: req.session.user || null
+            })
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
@@ -92,7 +109,12 @@ router.post("/register", async (req, res) => {
         res.redirect("/login")
     } catch (error) {
         console.error(error)
-        res.render("register/regisindex", { error: "Error registering user" })
+        res.render("register/regisindex", {
+            error: "Error registering user",
+            old: oldData,
+            isFirstUser,             // ส่งไปด้วย
+            user: req.session.user || null
+        })
     }
 })
 
