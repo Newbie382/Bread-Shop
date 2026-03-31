@@ -1,0 +1,464 @@
+<nav class="navbar navbar-expand-md navbar-light my-navbar fixed-top">
+    
+    <% if (user) { %>
+        <a href="/" class="navbar-brand" style="margin-right: 60px;">
+            <img src="/images/home/logo.png">
+        </a>
+    <% } else { %>
+        <span class="navbar-brand" style="margin-right: 60px;">
+            <img src="/images/home/logo.png">
+        </span>
+    <% } %>
+
+    <ul class="navbar-nav">
+        <% if (user && user.position === "Admin") { %>
+        <li class="nav-item dropdown"><a
+                class="nav-link my-text text-uppercase font-weight-bold px-3 dropdown-toggle">ระบบหลังบ้าน (STORE)</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="/manage">จัดการสินค้า</a>
+                
+                <a class="dropdown-item" href="/addForm">เพิ่มสินค้า</a>
+            </div>
+        </li>
+        <% } if (user) { %>
+        <li class="nav-item dropdown"><a
+                class="nav-link my-text text-uppercase font-weight-bold px-3 dropdown-toggle">การขาย (SALES)</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="/sales/new">ขายสินค้า</a>
+
+                <a class="dropdown-item" href="/sales/all">แสดงรายการขาย</a>
+                
+                <% if (user && user.position === "Admin") { %>
+                    <a class="dropdown-item" href="/promotions">จัดการโปรโมชัน</a>
+                <% } %>
+            </div>
+        </li>
+        <% } %>
+
+        <li class="nav-item dropdown"><a
+                class="nav-link my-text text-uppercase font-weight-bold px-3 dropdown-toggle">สมาชิก (MEMBERS)</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="/register">สมัครสมาชิก</a>
+                <% if (user && user.position === "Admin") { %>
+                <a class="dropdown-item" href="/members">จัดการสมาชิก</a>
+                <% } %>
+            </div>
+        </li>
+
+        <li class="nav-item dropdown"><a
+                class="nav-link my-text text-uppercase font-weight-bold px-3 dropdown-toggle">เข้าสู่ระบบ (LOGIN)</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="/login">Login</a>
+                <% if (user) { %>
+                <a class="dropdown-item" href="/logout">Logout</a>
+                <% } %>
+            </div>
+        </li>
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+        <% if (user) { %>
+            <li class="nav-item">
+                <span class="nav-link text-white font-weight-bold">
+                    👤 <%= user.name %>
+                </span>
+            </li>
+        <% } else { %>
+            <li class="nav-item">
+                <span class="nav-link text-white font-weight-bold">
+                    👤 Guest
+                </span>
+            </li>
+        <% } %>
+    </ul>
+</nav>
+
+<div class="d-flex">
+    <!-- 🔹 Sidebar -->
+    <div class="sidebar p-3">
+        <% if (user) { %>
+        <a href="/" class="sidebar-link nav-link my-text text-white font-weight-bold px-3" style="margin-top: 16px;">🏠 Home</a>
+        <a href="/dashboard" class="sidebar-link nav-link my-text text-white font-weight-bold px-3">📊 Dashboard</a>
+        <a href="/manage" class="sidebar-link nav-link my-text text-white font-weight-bold px-3">📦 จัดการสินค้า</a>
+        <a href="/sales/new" class="sidebar-link nav-link my-text text-white font-weight-bold px-3">💰 ขายสินค้า</a>
+        <a href="/members" class="sidebar-link nav-link my-text text-white font-weight-bold px-3">👥 สมาชิก</a>
+        <% } %>
+    </div>
+    
+    <!-- 🔹 Content -->
+    <div class="content flex-grow-1">
+    </div>
+</div>
+
+<% if (user) { %>
+<script>
+  window.addEventListener("pageshow", function(e) {
+    if (e.persisted) {
+      window.location.replace("/check-session");
+    }
+  });
+</script>
+<% } %>
+
+<!-- ─── Help Chat Widget ─────────────────────────── -->
+<% if (user) { %>
+
+<div id="chatWidget">
+    <button id="chatToggleBtn" onclick="toggleChat()">
+        ❔
+        <span id="chatBadge" style="display:none;">!</span>
+    </button>
+
+    <div id="chatBox" style="display:none;">
+
+        <!-- Header -->
+        <div id="chatHeader">
+            <span>🛎 Help & FAQ</span>
+            <button onclick="toggleChat()" id="chatCloseBtn">✕</button>
+        </div>
+
+        <!-- Messages -->
+        <div id="chatMessages"></div>
+
+        <!-- FAQ Buttons -->
+        <div id="faqButtons">
+            <p class="faq-hint">เลือกหัวข้อที่ต้องการ:</p>
+            <button class="faq-cat" onclick="showTopic('howto')">📖 วิธีใช้งานระบบ</button>
+            <button class="faq-cat" onclick="showTopic('product')">🛍 สินค้า / ราคา</button>
+            <button class="faq-cat" onclick="showTopic('promo')">🎁 โปรโมชันที่มี</button>
+            <button class="faq-cat" onclick="showTopic('order')">❗ ปัญหาการสั่งซื้อ</button>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    #chatToggleBtn {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #4b1800;
+        color: white;
+        font-size: 1.4rem;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    #chatToggleBtn:hover {
+        background: #942f01;
+        transform: scale(1.08);
+    }
+
+    #chatBadge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #chatBox {
+        position: fixed;
+        bottom: 95px;
+        right: 28px;
+        width: 320px;
+        height: 460px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        z-index: 9998;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #chatHeader {
+        background: #4b1800;
+        color: white;
+        padding: 12px 16px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    #chatCloseBtn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 6px;
+        padding: 2px 6px;
+        transition: background 0.2s ease;
+    }
+
+    #chatCloseBtn:hover {
+        background: #942f01;
+    }
+
+    #chatMessages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: #fdf7e3; /* ใช้สีพื้นหลังเดียวกับ body */
+    }
+
+    .bubble {
+        max-width: 85%;
+        padding: 9px 13px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        word-break: break-word;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .bubble.user {
+        align-self: flex-end;
+        background: #4b1800;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .bubble.bot {
+        align-self: flex-start;
+        background: #fff;
+        border: 1px solid #e0c9bf;
+        border-bottom-left-radius: 4px;
+    }
+
+    .bubble.bot ul {
+        margin: 6px 0 0 0;
+        padding-left: 18px;
+    }
+
+    .bubble.bot li {
+        margin-bottom: 3px;
+    }
+
+    /* ── FAQ Buttons ── */
+    #faqButtons {
+        padding: 10px 12px;
+        border-top: 1px solid #e0c9bf;
+        background: #fffaf6;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .faq-hint {
+        font-size: 0.75rem;
+        color: #888;
+        margin: 0 0 2px 0;
+    }
+
+    .faq-cat {
+        background: #f5ede8;
+        border: 1px solid #d4a898;
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 0.82rem;
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .faq-cat:hover {
+        background: #e8cfc5;
+        padding-left: 16px; /* เลื่อนเหมือน sidebar-link */
+    }
+
+    .faq-sub {
+        background: #f9f3f0;
+        border: 1px solid #e0c9bf;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.2s ease, padding-left 0.2s ease;
+    }
+
+    .faq-sub:hover {
+        background: #f0ddd5;
+        padding-left: 16px;
+    }
+
+    .faq-back {
+        background: transparent;
+        border: none;
+        color: #4b1800;
+        font-size: 0.78rem;
+        cursor: pointer;
+        padding: 2px 0;
+        text-align: left;
+        transition: color 0.2s ease;
+    }
+
+    .faq-back:hover {
+        color: #942f01;
+    }
+</style>
+
+<script>
+    const FAQ = {
+        howto: {
+            label: '📖 วิธีใช้งานระบบ',
+            items: [
+                {
+                    q: 'วิธีเพิ่มสินค้าใหม่',
+                    a: 'ไปที่เมนู <b>ระบบหลังบ้าน → เพิ่มสินค้า</b> แล้วกรอกชื่อ ราคา รูปภาพ และกด Submit (เฉพาะ Admin)'
+                },
+                {
+                    q: 'วิธีบันทึกการขาย',
+                    a: 'ไปที่เมนู <b>การขาย → ขายสินค้า</b> เลือกสินค้า สมาชิก จำนวน และวิธีชำระเงิน'
+                },
+                {
+                    q: 'วิธีดู Dashboard',
+                    a: 'กดที่ <b>📊 Dashboard</b> ใน Sidebar แล้วเลือกช่วงวันที่ที่ต้องการดูรายงาน'
+                },
+                {
+                    q: 'วิธีเพิ่มสมาชิก',
+                    a: 'ไปที่เมนู <b>สมาชิก → สมัครสมาชิก</b> แล้วกรอกข้อมูลให้ครบ'
+                }
+            ]
+        },
+        product: {
+            label: '🛍 สินค้า / ราคา',
+            items: [
+                {
+                    q: 'ดูสินค้าทั้งหมดได้ที่ไหน',
+                    a: 'กดที่ <b>🏠 Home</b> จะแสดงสินค้าทั้งหมดพร้อมราคา'
+                },
+                {
+                    q: 'ค้นหาสินค้าตามราคา',
+                    a: 'ที่หน้า Home มีช่องกรองราคา Min–Max กรอกแล้วกด Search'
+                },
+                {
+                    q: 'แก้ไขราคาสินค้า',
+                    a: 'ไปที่ <b>จัดการสินค้า</b> กดปุ่ม Edit ที่สินค้าที่ต้องการ แล้วแก้ไขราคา (เฉพาะ Admin)'
+                }
+            ]
+        },
+        promo: {
+            label: '🎁 โปรโมชัน',
+            items: [
+                {
+                    q: 'มีโปรโมชันอะไรบ้าง',
+                    a: 'มี 3 ประเภท:<ul><li>ส่วนลด % เช่น ลด 10%</li><li>ส่วนลดคงที่ เช่น ลด 50 บาท</li><li>ซื้อครบได้ส่วนลด เช่น ซื้อครบ 500 ลด 80 บาท</li></ul>'
+                },
+                {
+                    q: 'วิธีใช้โปรโมชัน',
+                    a: 'ตอนขายสินค้า ให้เลือก Promotion จาก dropdown ระบบจะคำนวณส่วนลดให้อัตโนมัติ'
+                },
+                {
+                    q: 'วิธีเพิ่มโปรโมชันใหม่',
+                    a: 'ไปที่ <b>การขาย → จัดการโปรโมชัน</b> แล้วกรอกชื่อ ประเภท และมูลค่าส่วนลด (เฉพาะ Admin)'
+                }
+            ]
+        },
+        order: {
+            label: '❗ ปัญหาการสั่งซื้อ',
+            items: [
+                {
+                    q: 'บันทึกการขายแล้วไม่ขึ้น',
+                    a: 'ลองตรวจสอบว่าเลือกสินค้า สมาชิก และจำนวนครบหรือยัง แล้วกด Submit อีกครั้ง'
+                },
+                {
+                    q: 'ยอดรวมไม่ถูกต้อง',
+                    a: 'ตรวจสอบว่า Promotion ที่เลือกตรงเงื่อนไขหรือไม่ เช่น ซื้อครบขั้นต่ำ'
+                },
+                {
+                    q: 'ไม่สามารถเข้าถึงหน้าขายได้',
+                    a: 'หน้านี้ต้องการสิทธิ์ Admin หรือ Cashier กรุณาล็อกอินด้วยบัญชีที่มีสิทธิ์'
+                }
+            ]
+        }
+    };
+
+    let isOpen = false;
+
+    // ── เปิด/ปิด ──────────────────────────────────────────
+    function toggleChat() {
+        const box = document.getElementById('chatBox');
+        isOpen = !isOpen;
+        box.style.display = isOpen ? 'flex' : 'none';
+        if (isOpen) showWelcome();
+    }
+
+    // ── ข้อความต้อนรับ ────────────────────────────────────
+    function showWelcome() {
+        const msgs = document.getElementById('chatMessages');
+        if (msgs.children.length === 0) {
+            addBubble('bot', 'สวัสดีครับ 👋 มีอะไรให้ช่วยไหม? เลือกหัวข้อด้านล่างได้เลยครับ');
+        }
+        showMainMenu();
+    }
+
+    // ── เมนูหลัก ──────────────────────────────────────────
+    function showMainMenu() {
+        const faqDiv = document.getElementById('faqButtons');
+        faqDiv.innerHTML = `
+            <p class="faq-hint">เลือกหัวข้อที่ต้องการ:</p>
+            <button class="faq-cat" onclick="showTopic('howto')">📖 วิธีใช้งานระบบ</button>
+            <button class="faq-cat" onclick="showTopic('product')">🛍 สินค้า / ราคา</button>
+            <button class="faq-cat" onclick="showTopic('promo')">🎁 โปรโมชันที่มี</button>
+            <button class="faq-cat" onclick="showTopic('order')">❗ ปัญหาการสั่งซื้อ</button>
+        `;
+    }
+
+    // ── แสดงคำถามในหัวข้อ ─────────────────────────────────
+    function showTopic(key) {
+        const topic = FAQ[key];
+        addBubble('user', topic.label);
+
+        const faqDiv = document.getElementById('faqButtons');
+        let html = `<button class="faq-back" onclick="showMainMenu()">← กลับหัวข้อหลัก</button>`;
+        topic.items.forEach((item, i) => {
+            html += `<button class="faq-sub" onclick="showAnswer('${key}', ${i})">${item.q}</button>`;
+        });
+        faqDiv.innerHTML = html;
+    }
+
+    // ── แสดงคำตอบ ─────────────────────────────────────────
+    function showAnswer(key, idx) {
+        const item = FAQ[key].items[idx];
+        addBubble('user', item.q);
+        addBubble('bot', item.a);
+    }
+
+    // ── เพิ่ม bubble ──────────────────────────────────────
+    function addBubble(type, html) {
+        const msgs = document.getElementById('chatMessages');
+        const div  = document.createElement('div');
+        div.className   = `bubble ${type}`;
+        div.innerHTML   = html;
+        msgs.appendChild(div);
+        msgs.scrollTop  = msgs.scrollHeight;
+    }
+</script>
+
+<% } %>

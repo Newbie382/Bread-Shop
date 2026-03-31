@@ -1,0 +1,498 @@
+/* สไตล์พื้นฐาน */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdf7e3 !important; /* สีไข่ (ครีมอ่อน) */
+    margin: 0;
+    padding: 0;
+    padding-top: 40px;
+}
+
+.container {
+    width: 90%; /* ใช้ % ที่เยอะหน่อยแล้วคุมด้วย max-width */
+    max-width: 800px;
+    margin: 30px auto;
+    background: #ffe693 !important;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* สไตล์หัวข้อ */
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* ปุ่มเพิ่มการขาย */
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.btn:hover {
+    background-color: #218838;
+}
+
+/* ตารางแสดงข้อมูล */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #4b1800;
+    color: white;
+}
+
+tr {
+    background-color: #f9f9f9;
+}
+
+.table tbody tr {
+    background-color: #ffffff;
+}
+
+/* สไตล์หัวข้อ */
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+form input {
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+
+.btn-cancel {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+}
+
+form button {
+    padding: 10px;
+}
+
+/* จัดรูปแบบกล่องป้อนข้อมูล */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* ปุ่มกด */
+.btn-edit{
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit:hover {
+    background-color: #218838;
+}
+
+.btn-delete{
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+/* ปุ่ม Cancel */
+.btn-cancel {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+/* ฟอร์มกรองช่วงเวลา */
+.date-filter {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.date-filter label {
+    font-weight: bold;
+}
+
+.date-filter input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.date-filter button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.date-filter button:hover {
+    background-color: #0056b3;
+}
+
+/* กำหนดพื้นที่ว่างด้านบนสำหรับ div.form-group */
+.form-group {
+    margin-top: 20px; /* ปรับค่าตามที่ต้องการ */
+}
+
+.error {
+    background-color: #dc3545;
+    color: #ffffff;
+    padding: 12px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.my-navbar {
+    background-color: #4b1800;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.navbar-brand img {
+    height: 40px;   /* ปรับความสูงโลโก้ */
+    width: auto;    /* ให้กว้างสัมพันธ์อัตโนมัติ */
+}
+
+.navbar .my-text {
+    color: #ffffff !important; /* สีไข่ (ครีมอ่อน) */
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+}
+
+.btn-search {
+    background-color: #4b1800 !important; /* สีพื้นปุ่ม */
+    color: #fff;               /* สีตัวหนังสือ */
+    border: none;
+}
+
+.btn-search:hover {
+    background-color: #942f01 !important; /* สีพื้นปุ่มเมื่อ hover */
+    color: #fff;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    background-color: #4b1800;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.30);
+}
+
+/* ลิงก์ใน sidebar */
+.sidebar-link {
+    display: block;
+    color: #fff;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+    background-color: #942f01;
+    transform: translateX(5px);
+}
+
+/* Content ขยับไม่ให้ทับ sidebar */
+.content {
+    margin-left: 220px;
+    padding: 20px;
+}
+
+/* 🔥 ทำให้ dropdown ลื่น */
+.dropdown-menu {
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    background-color: #fff3cd;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.dropdown-item {
+    border-radius: 5px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #ffd447;
+    color: #4b1800;
+}
+
+/* 🔥 Dropdown smooth + มุมมน */
+.navbar .dropdown {
+    position: relative;
+}
+
+/* ซ่อนก่อน */
+.navbar .dropdown-menu {
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    
+    transition: all 0.25s ease;
+    
+    border-radius: 12px;   /* มุมมน */
+    border: none;
+    padding: 8px;
+    background-color: #fff3cd;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* hover แล้วแสดง */
+.navbar .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* item */
+.navbar .dropdown-item {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+/* hover item */
+.navbar .dropdown-item:hover {
+    background-color: #ffd447;
+    color: #4b1800;
+    padding-left: 20px;
+}
+
+/* hover menu หลัก */
+.navbar .nav-link:hover {
+    background-color: #942f01;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+/* เอาลูกศรออก */
+.navbar .dropdown-toggle::after {
+    display: none;
+}
+
+.dashboard-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+.date-filter-group {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.date-filter-group .form-group {
+    margin-bottom: 0;
+}
+.date-filter-group label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #666;
+    display: block;
+    margin-bottom: 4px;
+}
+.date-filter-group input[type="date"] {
+    font-size: 0.88rem;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    background: #fafafa;
+}
+.date-filter-group input[type="date"]:focus {
+    outline: none;
+    border-color: #4e73df;
+    background: #fff;
+}
+#btnLoad {
+    font-size: 0.88rem;
+    padding: 6px 16px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+#btnExportCSV {
+    font-size: 0.88rem;
+    padding: 6px 16px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+.stat-icon.blue   { background: #e8f0fe; }
+.stat-icon.green  { background: #e6f4ea; }
+.stat-icon.orange { background: #fff3e0; }
+.stat-label {
+    font-size: 0.75rem;
+    color: #000000;
+    margin-bottom: 2px;
+}
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+}
+#alertBox {
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.canvas-wrapper {
+    position: relative;
+}
+#loadingOverlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.75);
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+#loadingOverlay.show {
+    display: flex;
+}
+.spinner-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 8px;
+}
+
+/* ซ่อนลูกศร dropdown */
+.no-arrow {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: none !important;
+}
+
+select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.card-action .btn-sm {
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    height: 31px;        /* เท่ากับ form-control-sm */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

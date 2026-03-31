@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Bread Shop</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="/js/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="/js/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <%- include('navbar.ejs') %>
+
+    <div class="container mt-4 mb-5">
+
+        <div class="d-flex align-items-center mb-4 gap-2">
+            <h2 class="mb-0">📊 Dashboard</h2>
+            <span class="text-muted ml-2" style="font-size:0.95rem;">ยินดีต้อนรับ, <strong><%= user.name %></strong></span>
+        </div>
+
+        <!-- ─── Stat Cards ─────────────────────────────── -->
+        <div class="row" id="statCards">
+            <div class="col-sm-4">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📈</div>
+                    <div>
+                        <div class="stat-label">ยอดขายรวม (ช่วงที่เลือก)</div>
+                        <p class="stat-value" id="statTotal">—</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="stat-card">
+                    <div class="stat-icon green">📅</div>
+                    <div>
+                        <div class="stat-label">จำนวนวันที่มีการขาย</div>
+                        <p class="stat-value" id="statDays">—</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="stat-card">
+                    <div class="stat-icon orange">🏆</div>
+                    <div>
+                        <div class="stat-label">วันที่ขายสูงสุด</div>
+                        <p class="stat-value" id="statBestDay">—</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Chart Card ─────────────────────────────── -->
+        <div class="dashboard-card">
+            <div class="chart-header">
+                <p class="chart-title">📉 ยอดขายรายวัน</p>
+
+                <!-- Date Range Picker -->
+                <div class="date-filter-group">
+                    <div class="form-group">
+                        <label for="startDate">วันเริ่มต้น</label>
+                        <input type="date" id="startDate" />
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">วันสิ้นสุด</label>
+                        <input type="date" id="endDate" />
+                    </div>
+                    <div class="col-auto">
+                        <button id="btnLoad" class="btn btn-success w-100 m-0">🔍 ดูรายงาน</button>
+                    </div>
+                    <div class="col-auto">
+                        <button id="btnExportCSV" class="btn btn-success w-100 m-0" disabled>📥 Export CSV</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert -->
+            <div id="alertBox" class="alert d-none" role="alert"></div>
+
+            <!-- Chart -->
+            <div class="canvas-wrapper">
+                <div id="loadingOverlay">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <div class="spinner-text">กำลังโหลดข้อมูล...</div>
+                    </div>
+                </div>
+                <canvas id="salesChart" height="90"></canvas>
+            </div>
+        </div>
+
+    </div><!-- /container -->
+
+    <script>
+        let salesChart = null;
+        let currentData = [];
+
+        // ─── ตั้งค่า default: 7 วันล่าสุด ───────────────────
+        const today = new Date();
+        const weekAgo = new Date();
+        weekAgo.setDate(today.getDate() - 6);
+
+        const defaultStart = weekAgo.toISOString().split('T')[0];
+        const defaultEnd   = today.toISOString().split('T')[0];
+
+        // โหลดจาก localStorage ถ้ามี ไม่งั้นใช้ค่า default
+        document.getElementById('startDate').value = localStorage.getItem('dash_startDate') || defaultStart;
+        document.getElementById('endDate').value   = localStorage.getItem('dash_endDate')   || defaultEnd;
+
+        // บันทึกลง localStorage ทุกครั้งที่เปลี่ยนค่า
+        document.getElementById('startDate').addEventListener('change', function () {
+            localStorage.setItem('dash_startDate', this.value);
+        });
+        document.getElementById('endDate').addEventListener('change', function () {
+            localStorage.setItem('dash_endDate', this.value);
+        });
+
+        // โหลดครั้งแรกตอนเปิดหน้า
+        loadChart();
+
+        document.getElementById('btnLoad').addEventListener('click', loadChart);
+        document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+
+        // ─── โหลดข้อมูลจาก API ───────────────────────────────
+        async function loadChart() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate   = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                return showAlert('กรุณาเลือกวันเริ่มต้นและวันสิ้นสุด', 'danger');
+            }
+            if (new Date(startDate) > new Date(endDate)) {
+                return showAlert('วันเริ่มต้นต้องไม่เกินวันสิ้นสุด', 'danger');
+            }
+
+            hideAlert();
+            setLoading(true);
+
+            try {
+                const res = await fetch(`/api/sales?startDate=${startDate}&endDate=${endDate}`);
+                if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+                const salesData = await res.json();
+
+                if (!salesData.length) {
+                    showAlert('ไม่พบข้อมูลยอดขายในช่วงวันที่เลือก', 'warning');
+                    currentData = [];
+                    document.getElementById('btnExportCSV').disabled = true;
+                    resetStats();
+                    if (salesChart) { salesChart.destroy(); salesChart = null; }
+                    return;
+                }
+
+                currentData = salesData;
+                document.getElementById('btnExportCSV').disabled = false;
+
+                renderChart(salesData);
+                updateStats(salesData);
+
+            } catch (err) {
+                console.error(err);
+                showAlert('เกิดข้อผิดพลาดในการดึงข้อมูล กรุณาลองใหม่', 'danger');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ─── วาดกราฟ ─────────────────────────────────────────
+        function renderChart(salesData) {
+            const labels = salesData.map(item => item.date);
+            const totals = salesData.map(item => item.total);
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if (salesChart) salesChart.destroy();
+
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ยอดขาย (บาท)',
+                        data: totals,
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78,115,223,0.08)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#4e73df',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `฿${ctx.parsed.y.toLocaleString('th-TH')}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: val => `฿${Number(val).toLocaleString('th-TH')}`
+                            },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ─── อัปเดต Stat Cards ───────────────────────────────
+        function updateStats(salesData) {
+            const totals   = salesData.map(item => item.total);
+            const sum      = totals.reduce((a, b) => a + b, 0);
+            const maxTotal = Math.max(...totals);
+            const bestDay  = salesData.find(item => item.total === maxTotal);
+
+            document.getElementById('statTotal').textContent   = `฿${sum.toLocaleString('th-TH')}`;
+            document.getElementById('statDays').textContent    = `${salesData.length} วัน`;
+            document.getElementById('statBestDay').textContent = bestDay ? bestDay.date : '—';
+        }
+
+        function resetStats() {
+            document.getElementById('statTotal').textContent   = '—';
+            document.getElementById('statDays').textContent    = '—';
+            document.getElementById('statBestDay').textContent = '—';
+        }
+
+        // ─── Export CSV ───────────────────────────────────────
+        function exportCSV() {
+            if (!currentData.length) return;
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate   = document.getElementById('endDate').value;
+
+            const rows = [
+                ['\uFEFFวันที่', 'ยอดขาย (บาท)'],
+                ...currentData.map(item => [item.date, item.total])
+            ];
+
+            const csvContent = rows.map(r => r.join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url  = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sales_${startDate}_${endDate}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ─── Helpers ─────────────────────────────────────────
+        function setLoading(state) {
+            const overlay = document.getElementById('loadingOverlay');
+            const btn     = document.getElementById('btnLoad');
+            if (state) {
+                overlay.classList.add('show');
+                btn.disabled = true;
+                btn.textContent = '⏳ กำลังโหลด...';
+            } else {
+                overlay.classList.remove('show');
+                btn.disabled = false;
+                btn.textContent = '🔍 ดูรายงาน';
+            }
+        }
+
+        function showAlert(msg, type) {
+            const box = document.getElementById('alertBox');
+            box.className = `alert alert-${type}`;
+            box.textContent = msg;
+            box.classList.remove('d-none');
+        }
+
+        function hideAlert() {
+            document.getElementById('alertBox').classList.add('d-none');
+        }
+    </script>
+</body>
+</html>

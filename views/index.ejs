@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= title %>
+    </title>
+
+    </title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <script src="js/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .search-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-form input {
+            margin-right: 10px;
+        }
+
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        /* .card:hover {
+            transform: scale(1.03);
+        } */
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            text-align: center;
+        }
+
+        .btn-search {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-search:hover {
+            background-color: #0056b3;
+        }
+
+        /* จัดกึ่งกลางทั้งแถว */
+        .card-action {
+            display: flex;
+            justify-content: center;
+        }
+
+    </style>
+</head>
+
+<body>
+    <%- include('navbar.ejs') %>
+
+        <div class="container mt-4">
+            <!-- 🔎 ฟอร์มค้นหาสินค้า -->
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <form action="/search" method="GET" class="search-form">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <input type="number" class="form-control" name="min" placeholder="ราคาต่ำสุด">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control" name="max" placeholder="ราคาสูงสุด">
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <button type="submit" class="btn btn-search w-100">ค้นหา</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 🛍️ แสดงรายการสินค้า -->
+            <div class="row mt-3">
+                <% Object.values(products).forEach(function(item){ %>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card">
+                            <a href="/<%= item.id %>">
+                                <img class="card-img-top img-thumbnail"
+                                    src="./images/products/<%= item.image %>"
+                                    alt="<%= item.name %>">
+                            </a>
+                            <!-- แก้ card-body เพิ่ม hr และ card-action -->
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="/<%= item.id %>" class="text-dark">
+                                        <%= item.name %>
+                                    </a>
+                                </h5>
+                                <p class="card-text mb-2">
+                                    <strong>ราคา:</strong> <%= item.price %> THB
+                                </p>
+
+                                <hr class="my-2">
+
+                                <!-- ── ปุ่ม +/- จำนวน + Sale + Clear ── -->
+                                <div class="card-action">
+                                    <div class="d-flex align-items-center justify-content-center mb-2" style="gap:6px;">
+                                        <!-- ติ๊กถูก -->
+                                        <a id="saleBtn-<%= item.id %>"
+                                        href="/sales/new?productId=<%= item.id %>&qty=1"
+                                        class="btn btn-edit btn-sm" style="margin-top: 14px;">
+                                            ✔
+                                        </a>
+
+                                        <button class="btn btn-sm btn-search" style="margin-top: 14px;"
+                                                onclick="changeQty('<%= item.id %>', -1)">−</button>
+                                        <input type="number" id="qty-<%= item.id %>"
+                                            value="1" min="1"
+                                            style="width:56px; text-align:center; font-weight:bold;"
+                                            class="form-control form-control-sm qty-input"
+                                            oninput="updateSaleBtn('<%= item.id %>')">
+                                        <button class="btn btn-sm btn-search" style="margin-top: 14px;"
+                                                onclick="changeQty('<%= item.id %>', 1)">+</button>
+
+                                        <!-- ลบ -->
+                                        <button class="btn btn-delete btn-sm" style="margin-top: 14px;"
+                                                onclick="clearQty('<%= item.id %>')"
+                                                title="รีเซ็ตจำนวน">
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+            <script>
+                function changeQty(id, delta) {
+                    const input = document.getElementById('qty-' + id);
+                    let qty = parseInt(input.value) + delta;
+                    if (qty < 1) qty = 1;
+                    input.value = qty;
+                    updateSaleBtn(id);
+                }
+
+                function clearQty(id) {
+                    document.getElementById('qty-' + id).value = 1;
+                    updateSaleBtn(id);
+                }
+
+                function updateSaleBtn(id) {
+                    const qty = parseInt(document.getElementById('qty-' + id).value) || 1;
+                    document.getElementById('saleBtn-' + id).href = `/sales/new?productId=${id}&qty=${qty}`;
+                }
+            </script>
+
+        </div>
+</body>
+
+</html>

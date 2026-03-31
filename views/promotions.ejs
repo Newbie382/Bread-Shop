@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Promotions</title>
+    <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <script src="/js/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="/js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        /* บังคับไม่ให้ข้อความใน Table Header และ Cell ตกบรรทัด */
+        .table th, .table td {
+            white-space: nowrap; 
+            vertical-align: middle !important;
+        }
+        /* ปล่อยให้ชื่อโปรโมชันตัดบรรทัดได้ถ้ามันยาวจริงๆ แต่กำหนดความกว้างสูงสุดไว้ */
+        .col-name {
+            width: 30%; /* ปรับค่า % ได้ตามต้องการเพื่อให้ช่องชื่อแคบลง */
+            white-space: normal !important; 
+        }
+        /* ปรับปุ่มให้ขนาดพอดี */
+        .btn-sm {
+            padding: .25rem .5rem;
+        }
+    </style>
+</head>
+
+<body>
+<%- include('navbar.ejs') %>
+
+<div class="container mt-4 mb-5" style="max-width: 720px;">
+    <h2 class="mb-4">🎁 จัดการโปรโมชัน</h2>
+
+    <!-- ── Alert ───────────────────────────────────────── -->
+    <% if (typeof success !== 'undefined') { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+    <% if (typeof error !== 'undefined') { %>
+        <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+
+    <!-- ── Add Form ─────────────────────────────────────── -->
+    <div class="card mb-4">
+        <div class="card-header font-weight-bold">➕ เพิ่มโปรโมชันใหม่</div>
+        <div class="card-body">
+            <form action="/promotions/insert" method="POST">
+
+                <div class="form-group">
+                    <label>ชื่อโปรโมชัน</label>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="เช่น ลดหน้าร้อน 10%" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ประเภทส่วนลด</label>
+                    <select name="type" id="promoType" class="form-control" required>
+                        <option value="" disabled selected>-- เลือกประเภท --</option>
+                        <option value="percent">ส่วนลด % (เช่น ลด 10%)</option>
+                        <option value="fixed">ส่วนลดคงที่ (เช่น ลด 50 บาท)</option>
+                        <option value="minspend">ซื้อครบได้ส่วนลด</option>
+                    </select>
+                </div>
+
+                <!-- ยอดขั้นต่ำ — แสดงเฉพาะ minspend -->
+                <div class="form-group" id="minAmountGroup" style="display:none;">
+                    <label>ยอดซื้อขั้นต่ำ (บาท)</label>
+                    <input type="number" name="minAmount" id="minAmount"
+                           class="form-control" min="1" placeholder="เช่น 500">
+                </div>
+
+                <div class="form-group">
+                    <label id="valueLabel">มูลค่าส่วนลด</label>
+                    <div class="input-group">
+                        <input type="number" name="value" id="promoValue"
+                               class="form-control" min="0" step="0.01" required
+                               placeholder="เช่น 10">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="valueUnit">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="isActive" style="display:flex; align-items:center; gap:8px; cursor:pointer; width:fit-content;">
+                        <input type="checkbox" name="isActive" id="isActive" value="true" checked
+                               style="width:16px; height:16px; margin:0; position:static;">
+                        เปิดใช้งานส่วนลด
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-success">💾 บันทึก</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Promotion List ────────────────────────────────── -->
+<div class="card">
+    <div class="card-header font-weight-bold">📋 รายการโปรโมชันทั้งหมด</div>
+    <div class="card-body p-0" style="overflow-x: auto;"> <table class="table table-hover mb-0">
+            <thead class="thead-light">
+                <tr>
+                    <th class="col-name">ชื่อ</th> <th>ประเภท</th>
+                    <th>ส่วนลด</th>
+                    <th>ขั้นต่ำ</th>
+                    <th>สถานะ</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+            <% if (promotions.length === 0) { %>
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">ยังไม่มีโปรโมชัน</td>
+                </tr>
+            <% } %>
+            <% promotions.forEach(promo => { %>
+                <tr>
+                    <td class="col-name"><%= promo.name %></td>
+                    <td>
+                        <% if (promo.type === 'percent') { %>
+                            <span class="badge badge-primary">%</span>
+                        <% } else if (promo.type === 'fixed') { %>
+                            <span class="badge badge-info">คงที่</span>
+                        <% } else { %>
+                            <span class="badge badge-warning text-dark">ขั้นต่ำ</span>
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (promo.type === 'percent') { %>
+                            <%= promo.value %>%
+                        <% } else { %>
+                            <%= promo.value.toLocaleString('th-TH') %>฿
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (promo.type === 'minspend') { %>
+                            <%= promo.minAmount.toLocaleString('th-TH') %>฿
+                        <% } else { %>
+                            <span class="text-muted">—</span>
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (promo.isActive) { %>
+                            <span class="badge badge-success">เปิด</span>
+                        <% } else { %>
+                            <span class="badge badge-secondary">ปิด</span>
+                        <% } %>
+                    </td>
+                    <td> <a href="/promotions/toggle/<%= promo._id %>" 
+                            class="btn btn-sm btn-edit save-scroll" 
+                            title="เปิด/ปิด">
+                            <%= promo.isActive ? '🔒' : '🔓' %>
+                        </a>
+                        <a href="/promotions/delete/<%= promo._id %>"
+                           class="btn btn-sm btn-delete"
+                           onclick="return confirm('ลบโปรโมชันนี้?')">🗑</a>
+                    </td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const promoType  = document.getElementById('promoType');
+    const valueUnit  = document.getElementById('valueUnit');
+    const valueLabel = document.getElementById('valueLabel');
+    const minGroup   = document.getElementById('minAmountGroup');
+    const minAmount  = document.getElementById('minAmount');
+
+    promoType.addEventListener('change', function () {
+        const val = this.value;
+
+        if (val === 'percent') {
+            valueUnit.textContent  = '%';
+            valueLabel.childNodes[0].textContent = 'ส่วนลด (%) ';
+            minGroup.style.display = 'none';
+            minAmount.required     = false;
+        } else if (val === 'fixed') {
+            valueUnit.textContent  = '฿';
+            valueLabel.childNodes[0].textContent = 'ส่วนลด (บาท) ';
+            minGroup.style.display = 'none';
+            minAmount.required     = false;
+        } else if (val === 'minspend') {
+            valueUnit.textContent  = '฿';
+            valueLabel.childNodes[0].textContent = 'ส่วนลดที่ได้รับ (บาท) ';
+            minGroup.style.display = 'block';
+            minAmount.required     = true;
+        }
+    });
+
+    // 1. เมื่อมีการคลิกปุ่มที่มี class 'save-scroll'
+    document.querySelectorAll('.save-scroll').forEach(button => {
+        button.addEventListener('click', function() {
+            // บันทึกค่าการ Scroll ปัจจุบันไว้ในเครื่องผู้ใช้
+            localStorage.setItem('promotion_scroll_pos', window.scrollY);
+        });
+    });
+
+    // 2. เมื่อหน้าเว็บโหลดเสร็จ (หลังจากกดเปิด/ปิดแล้วหน้า Refresh กลับมา)
+    window.addEventListener('load', function() {
+        const scrollPos = localStorage.getItem('promotion_scroll_pos');
+        if (scrollPos) {
+            // เลื่อนจอกลับไปที่เดิมแบบทันที (behavior: 'instant' จะไม่เห็นการวูบ)
+            window.scrollTo({
+                top: parseInt(scrollPos),
+                behavior: 'instant' 
+            });
+            // ลบค่าทิ้งเพื่อไม่ให้ค้างไปใช้กับครั้งหน้าหรือหน้าอื่น
+            localStorage.removeItem('promotion_scroll_pos');
+        }
+    });
+</script>
+</body>
+</html>

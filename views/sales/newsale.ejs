@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Sale</title>
+    <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <script src="/js/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="/js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <%- include('../navbar.ejs') %>
+    <div class="container mt-4" style="max-width: 560px;">
+        <h1 class="mb-4">Add New Sale</h1>
+
+        <form action="/sales/insert" method="POST">
+
+            <!-- Product -->
+            <div class="form-group">
+                <label>Product:</label>
+                <select name="product" id="selectProduct" class="form-control" required>
+                    <option value="" disabled <%= !locals.selectedProduct ? 'selected' : '' %>>-- เลือกสินค้า --</option>
+                    <% products.forEach(product => { %>
+                        <option value="<%= product._id %>"
+                                data-price="<%= product.price %>"
+                                <%= locals.selectedProduct && locals.selectedProduct.toString() === product._id.toString() ? 'selected' : '' %>>
+                            <%= product.name %> - <%= product.price %>฿
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <!-- Member -->
+            <div class="form-group">
+                <label>Member:</label>
+                <select name="member"
+                    class="form-control <%= user.position !== 'Admin' ? 'no-arrow' : '' %>"
+                    <%= user.position !== 'Admin' ? 'disabled' : '' %>>
+                    <% members.forEach(member => { %>
+                        <option value="<%= member._id %>"
+                            <%= user._id.toString() === member._id.toString() ? 'selected' : '' %>>
+                            <%= member.name %>
+                        </option>
+                    <% }) %>
+                </select>
+                <% if (user.position !== 'Admin') { %>
+                    <!-- ส่งค่าแทน select ที่ disabled -->
+                    <input type="hidden" name="member" value="<%= user._id %>">
+                <% } %>
+            </div>
+
+            <!-- Quantity -->
+            <div class="form-group">
+                <label>Quantity:</label>
+                <input type="number" name="quantity" id="inputQuantity"
+                       class="form-control" required min="1" value="<%= locals.selectedQty || 1 %>">
+            </div>
+
+            <!-- Promotion -->
+            <div class="form-group">
+                <label>Promotion: <small class="text-muted">(ถ้ามี)</small></label>
+                <select name="promotion" id="selectPromotion" class="form-control">
+                    <option value="">-- ไม่ใช้ Promotion --</option>
+                    <% promotions.forEach(promo => { %>
+                        <option value="<%= promo._id %>"
+                                data-type="<%= promo.type %>"
+                                data-value="<%= promo.value %>"
+                                data-min="<%= promo.minAmount || 0 %>">
+                            <%= promo.name %>
+                            (<% if (promo.type === 'percent') { %>ลด <%= promo.value %>%
+                            <% } else if (promo.type === 'fixed') { %>ลด <%= promo.value %>฿
+                            <% } else if (promo.type === 'minspend') { %>ซื้อครบ <%= promo.minAmount %>฿ ลด <%= promo.value %>฿
+                            <% } %>)
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="form-group">
+                <label>การชำระเงิน:</label>
+                <div class="d-flex gap-3 mt-1">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio"
+                               name="paymentMethod" id="paymentCash"
+                               value="cash" checked>
+                        <label class="form-check-label text-nowrap" for="paymentCash" style="margin-bottom: 10px;">
+                            💵 เงินสด
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio"
+                               name="paymentMethod" id="paymentQR"
+                               value="qr">
+                        <label class="form-check-label text-nowrap" for="paymentQR" style="margin-bottom: 10px;">
+                            📱 QR Code
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="card mb-3 border-primary">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between">
+                        <span>ราคาสินค้ารวม</span>
+                        <span id="summarySubtotal">฿0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-success">
+                        <span>ส่วนลด</span>
+                        <span id="summaryDiscount">-฿0.00</span>
+                    </div>
+                    <hr class="my-1">
+                    <div class="d-flex justify-content-between font-weight-bold">
+                        <span>ยอดสุทธิ</span>
+                        <span id="summaryTotal" class="text-primary">฿0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden: ส่งยอดสุทธิไป Backend -->
+            <input type="hidden" name="totalAmount" id="hiddenTotal" value="0">
+            <input type="hidden" name="discount"    id="hiddenDiscount" value="0">
+
+            <div class="form-group row">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-edit">Submit</button>
+                    <a type="button" class="btn btn-delete" href="/">ย้อนกลับ</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        const selectProduct   = document.getElementById('selectProduct');
+        const inputQuantity   = document.getElementById('inputQuantity');
+        const selectPromotion = document.getElementById('selectPromotion');
+
+        // คำนวณทุกครั้งที่มีการเปลี่ยนแปลง
+        [selectProduct, inputQuantity, selectPromotion].forEach(el => {
+            el.addEventListener('change', calculate);
+            el.addEventListener('input',  calculate);
+        });
+
+        function calculate() {
+            const price    = parseFloat(selectProduct.selectedOptions[0]?.dataset.price) || 0;
+            const qty      = parseInt(inputQuantity.value) || 0;
+            const subtotal = price * qty;
+
+            // คำนวณส่วนลด
+            let discount = 0;
+            const promoOpt = selectPromotion.selectedOptions[0];
+            if (promoOpt && promoOpt.value) {
+                const type  = promoOpt.dataset.type;
+                const value = parseFloat(promoOpt.dataset.value) || 0;
+                const min   = parseFloat(promoOpt.dataset.min)   || 0;
+
+                if (type === 'percent') {
+                    discount = subtotal * (value / 100);
+                } else if (type === 'fixed') {
+                    discount = value;
+                } else if (type === 'minspend' && subtotal >= min) {
+                    discount = value;
+                }
+                // ส่วนลดต้องไม่เกินยอดรวม
+                discount = Math.min(discount, subtotal);
+            }
+
+            const total = subtotal - discount;
+
+            // อัปเดต UI
+            document.getElementById('summarySubtotal').textContent = `฿${subtotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+            document.getElementById('summaryDiscount').textContent = `-฿${discount.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+            document.getElementById('summaryTotal').textContent    = `฿${total.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+
+            // ส่งค่าไป Backend
+            document.getElementById('hiddenTotal').value    = total.toFixed(2);
+            document.getElementById('hiddenDiscount').value = discount.toFixed(2);
+        }
+
+        // คำนวณทันทีตอนโหลด กรณีมีค่า pre-select มาแล้ว
+        calculate();
+    </script>
+</body>
+</html>

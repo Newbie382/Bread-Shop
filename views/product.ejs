@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= product.name %></title>
+    <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <script src="/js/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="/js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <%- include('navbar.ejs') %>
+
+    <div class="container mt-4 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="card shadow-sm">
+
+                    <!-- รูปสินค้า -->
+                    <img class="card-img-top img-fluid"
+                         src="/images/products/<%= product.image %>"
+                         alt="<%= product.name %>"
+                         style="max-height: 380px; object-fit: cover;">
+
+                    <div class="card-body px-4 py-3">
+
+                        <!-- ชื่อสินค้า -->
+                        <h3 class="card-title font-weight-bold mb-1">
+                            <%= product.name %>
+                        </h3>
+
+                        <!-- ราคา -->
+                        <p class="mb-3" style="font-size: 1.4rem; color: #4b1800; font-weight: 700;">
+                            ราคา: <%= Number(product.price).toLocaleString('th-TH') %> THB
+                        </p>
+
+                        <hr>
+
+                        <!-- รายละเอียด -->
+                        <h6 class="font-weight-bold text-muted mb-1">รายละเอียดสินค้า:</h6>
+                        <p class="card-text text-dark" style="line-height: 1.7;">
+                            <% if (product.description) { %>
+                                <%= product.description %>
+                            <% } else { %>
+                                <span class="text-muted">ไม่มีรายละเอียดสินค้า</span>
+                            <% } %>
+                        </p>
+
+                        <hr>
+
+                        <!-- ปุ่ม -->
+                        <div class="d-flex" style="gap: 10px;">
+                            <% if (typeof user !== 'undefined' && user) { %>
+                                <a href="/sales/new?productId=<%= product._id %>" class="btn btn-edit">
+                                    ขายสินค้านี้
+                                </a>
+                            <% } %>
+                            <a href="/" class="btn btn-delete">
+                                ย้อนกลับ
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

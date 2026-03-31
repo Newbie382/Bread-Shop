@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= title %></title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+        <script src="js/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <%- include('navbar.ejs') %>
+        <div class="container">
+            <div class="row my-3">
+                <div class="col-md-8 mx-auto mb-4">
+                    <form class="form-horizontal" method="POST" action="/insert" enctype="multipart/form-data">
+
+                        <div class="form-group row">
+                          <label class="control-label col-sm-4">ชื่อสินค้า</label>
+                          <div class="col-sm-10">
+                            <input type="text" class="form-control" name="name">
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-4">ราคา</label>
+                            <div class="col-sm-10">
+                              <input type="text" class="form-control" name="price">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-4">ภาพสินค้า</label>
+                            <div class="col-sm-10">
+                              <input type="file" class="form-control" name="image">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-4">รายละเอียด</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" cols="30" rows="4" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                          <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-edit">บันทึก</button>
+                            <a type="button" class="btn btn-delete" href="/">ย้อนกลับ</a>
+                          </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

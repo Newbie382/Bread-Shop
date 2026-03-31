@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= title %></title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+        <script src="js/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+        <link rel="stylesheet" href="css/style.css">
+        </head>
+    </head>
+    <body>
+        <%- include('navbar.ejs') %>
+        
+        <div class="container">
+            <h2>จัดการสินค้า</h2>
+            <p>เพิ่ม ลบ แก้ไขข้อมูลในฐานข้อมูล</p>   
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="🔍 ค้นหาสินค้า...">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ชื่อสินค้า</th>
+                        <th>ราคา</th>
+                        <th>รายละเอียด</th>
+                        <th>รูปภาพ</th>
+
+                        <% if (user && user.position === "Admin") { %>
+                            <th>ลบ</th>
+                            <th>แก้ไข</th>
+                        <% } %>
+                    </tr>
+                </thead>
+
+                <tbody id="productTable">
+                    <% Object.values(products).forEach(function(item){ %>
+                    <tr>
+                        <td class="name" style="white-space: nowrap;"><%= item.name %></td>
+                        <td class="price" style="white-space: nowrap;"><%= item.price %></td>
+                        <td class="description" style="white-space: nowrap;"><%= item.description %></td>
+                        <td style="white-space: nowrap;">
+                            <img class="card-img-top img-thumbnail" src="./images/products/<%= item.image %>" alt="<%= item.name %>"
+                                style="width: 30%; height: auto; margin: 0 auto; display: block;">
+                        </td>
+
+                        <% if (user && user.position === "Admin") { %>
+                        <td><a class="btn btn-delete" href="/delete/<%= item._id %>" onclick="return confirm('คุณต้องการลบข้อมูลหรือไม่')">ลบ</a></td>
+                        <td>
+                            <form action="/edit" method="POST">
+                                <input type="hidden" value="<%= item._id %>" name="id">
+                                <button type="submit" class="btn btn-edit">แก้ไข</button>
+                            </form>
+                        </td>
+                        <% } %>
+
+                    </tr>
+                    <% }) %>                    
+                </tbody>
+
+            </table>
+
+            <script>
+                document.getElementById("searchInput").addEventListener("keyup", function () {
+                    let filter = this.value.toLowerCase();
+                    let rows = document.querySelectorAll("#productTable tr");
+
+                    rows.forEach(row => {
+                        let name = row.querySelector(".name").textContent.toLowerCase();
+                        let price = row.querySelector(".price").textContent.toLowerCase();
+                        let description = row.querySelector(".description").textContent.toLowerCase();
+
+                        if (name.includes(filter) || price.includes(filter) || description.includes(filter)) {
+                            row.style.display = "";
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </body>
+</html>
