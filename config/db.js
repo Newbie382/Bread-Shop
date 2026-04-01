@@ -2,13 +2,11 @@
 // ใช้งาน Mongoose
 const mongoose = require('mongoose')
 
-// เชื่อมไปยัง MongoDB
-const dbUrl = 'mongodb://localhost:27017/BREADSHOP'
+// ดึงค่า URL จากไฟล์ .env (ถ้าไม่มีให้ใช้ค่า Default เป็น localhost)
+const dbUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/BREADSHOP'
 
-mongoose.connect(dbUrl,{
-    //useNewUrlParser:true,
-    //useUnifiedTopology:true     
-}).catch(err=>console.error('❌ Connection Error:', err))
+// เชื่อมไปยัง MongoDB
+mongoose.connect(dbUrl).catch(err => console.error('❌ Connection Error:', err))
 
 mongoose.connection.on('connected', () => console.log('✅ MongoDB Connected'));
 
@@ -17,4 +15,3 @@ process.on('SIGINT', async () => {
   console.log('🔴 MongoDB connection closed');
   process.exit(0);
 });
-
