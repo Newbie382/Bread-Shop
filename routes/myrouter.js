@@ -36,6 +36,7 @@ function allowRoles(...roles) {
 // ─── Public Routes ────────────────────────────────────────────
 
 router.get("/", async (req, res) => {
+    if (!req.session.user) return res.redirect("/login")
     try {
         const products = await Product.find();
         res.render("index", {products:products, title: title});
